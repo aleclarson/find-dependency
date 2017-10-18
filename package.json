@@ -1,5 +1,8 @@
 {
   "name": "find-dependency",
-  "version": "1.0.0",
-  "main": "findDependency.js"
+  "version": "1.0.1",
+  "main": "findDependency.js",
+  "dependencies": {
+    "fsx": "aleclarson/fsx#1.3.1"
+  }
 }
