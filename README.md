@@ -1,5 +1,5 @@
 
-# find-dependency v1.0.0 
+# find-dependency v1.0.2 
 
 Find the path to the package that will be used by `require`.
 
