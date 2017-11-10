@@ -1,24 +1,26 @@
 
-var path = require('path');
-var fs = require('fsx');
+const path = require('path');
+const fs = require('fs');
 
-var homePath = require('os').homedir();
-var globalPaths = process.env.NODE_PATH;
+const {S_IFMT, S_IFDIR, S_IFLNK} = fs.constants;
+
+const homePath = require('os').homedir();
+let globalPaths = process.env.NODE_PATH;
 if (globalPaths) {
   globalPaths = globalPaths.replace(/^:/, '').split(':');
 }
 
 function findDependency(name, cwd) {
-  var dir = cwd || process.cwd();
+  let dir = cwd || process.cwd();
 
   // Check the current directory.
-  var dep = path.join(dir, 'node_modules', name);
-  if (fs.isDir(dep)) return dep;
+  let dep = getDir(path.join(dir, 'node_modules', name));
+  if (dep) return dep;
 
   // Check every parent directory.
-  while ((dir = path.dirname(dir)) !== homePath) {
-    dep = path.join(dir, 'node_modules', name);
-    if (fs.isDir(dep)) return dep;
+  while ((dir = path.dirname(dir)) != homePath) {
+    dep = getDir(path.join(dir, 'node_modules', name));
+    if (dep) return dep;
   }
 
   // Check every global directory.
@@ -28,10 +30,35 @@ function findDependency(name, cwd) {
 }
 
 function findGlobalDependency(name) {
-  for (var i = 0; i < globalPaths.length; i++) {
-    dep = path.join(globalPaths[i], name);
-    if (fs.isDir(dep)) return dep;
+  for (let i = 0; i < globalPaths.length; i++) {
+    const dep = getDir(path.join(globalPaths[i], name));
+    if (dep) return dep;
   }
+}
+
+// Returns a directory path if one exists.
+function getDir(initialPath) {
+  let path = initialPath;
+  let mode = getMode(path);
+
+  let loops = 0;
+  while (mode == S_IFLNK) {
+    path = fs.readlinkSync(path);
+    mode = getMode(path);
+    if (++loops > 100) {
+      throw Error('Symlink caused infinite recursion: ' + initialPath);
+    }
+  }
+
+  if (mode == S_IFDIR) {
+    return path;
+  }
+}
+
+function getMode(path) {
+  try {
+    return fs.lstatSync(path).mode & S_IFMT;
+  } catch (e) {}
 }
 
 module.exports = findDependency;

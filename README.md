@@ -1,5 +1,5 @@
 
-# find-dependency v1.0.2 
+# find-dependency v1.1.0 
 
 Find the path to the package that will be used by `require`.
 
@@ -23,4 +23,6 @@ When you call `findDependency('foo', __dirname)`:
 - At any point, if the checked path exists, return it
 
 This simulates how `require` resolves the package path, before checking the `main` field of its `package.json` file.
+
+**New in v1.1.0:** No dependencies, and symlinks are followed.
 
