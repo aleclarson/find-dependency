@@ -1,5 +1,10 @@
 {
   "name": "find-dependency",
   "version": "1.2.0",
-  "main": "findDependency.js"
+  "main": "findDependency.js",
+  "prettier": "@alloc/prettier-config",
+  "devDependencies": {
+    "@alloc/prettier-config": "^1.0.0",
+    "prettier": "^2.1.2"
+  }
 }
