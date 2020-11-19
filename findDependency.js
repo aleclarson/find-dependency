@@ -1,6 +1,7 @@
 const { join, dirname, resolve } = require('path')
 const fs = require('fs')
 
+const realpathSync = fs.realpathSync.native || fs.realpathSync
 const { S_IFMT, S_IFDIR, S_IFLNK } = fs.constants
 
 const homePath = require('os').homedir()
@@ -30,33 +31,18 @@ function findDependency(name, cwd) {
 
 function findGlobalDependency(name) {
   for (let i = 0; i < globalPaths.length; i++) {
-    const dep = getDir(path.join(globalPaths[i], name))
+    const dep = getDir(join(globalPaths[i], name))
     if (dep) return dep
   }
 }
 
 // Returns a directory path if one exists.
-function getDir(initialPath) {
-  let path = initialPath
-  let mode = getMode(path)
-
-  let loops = 0
-  while (mode == S_IFLNK) {
-    path = fs.readlinkSync(path)
-    mode = getMode(path)
-    if (++loops > 100) {
-      throw Error('Symlink caused infinite recursion: ' + initialPath)
-    }
-  }
-
-  if (mode == S_IFDIR) {
-    return path
-  }
-}
-
-function getMode(path) {
+function getDir(path) {
   try {
-    return fs.lstatSync(path).mode & S_IFMT
+    path = realpathSync(path)
+    if ((fs.lstatSync(path).mode & S_IFMT) == S_IFDIR) {
+      return path
+    }
   } catch (e) {}
 }
 
