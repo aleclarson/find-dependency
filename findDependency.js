@@ -1,4 +1,4 @@
-const path = require('path')
+const { join, dirname, resolve } = require('path')
 const fs = require('fs')
 
 const { S_IFMT, S_IFDIR, S_IFLNK } = fs.constants
@@ -10,15 +10,15 @@ if (globalPaths) {
 }
 
 function findDependency(name, cwd) {
-  let dir = cwd || process.cwd()
+  let dir = resolve(cwd || process.cwd())
 
   // Check the current directory.
-  let dep = getDir(path.join(dir, 'node_modules', name))
+  let dep = getDir(join(dir, 'node_modules', name))
   if (dep) return dep
 
   // Check every parent directory.
-  while ((dir = path.dirname(dir)) != homePath) {
-    dep = getDir(path.join(dir, 'node_modules', name))
+  while ((dir = dirname(dir)) != homePath) {
+    dep = getDir(join(dir, 'node_modules', name))
     if (dep) return dep
   }
 
