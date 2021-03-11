@@ -10,8 +10,9 @@ if (globalPaths) {
   globalPaths = globalPaths.replace(/^:/, '').split(':')
 }
 
-function findDependency(name, cwd) {
-  let dir = resolve(cwd || process.cwd())
+function findDependency(name, opts) {
+  opts = typeof opts == 'string' ? { cwd: opts } : opts || {}
+  let dir = resolve(opts.cwd || process.cwd())
 
   // Check the current directory.
   let dep = getDir(join(dir, 'node_modules', name))
@@ -24,7 +25,7 @@ function findDependency(name, cwd) {
   }
 
   // Check every global directory.
-  if (globalPaths) {
+  if (globalPaths && !opts.skipGlobal) {
     return findGlobalDependency(name)
   }
 }
