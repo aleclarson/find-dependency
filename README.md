@@ -10,7 +10,17 @@ const findDependency = require('find-dependency');
 const packagePath = findDependency('foo', process.cwd());
 ```
 
-NOTE: The second argument is optional (defaults to `process.cwd()`).
+If only the import path is given, `process.cwd()` is used.
+
+You can also skip looking for a global installation.
+
+```ts
+findDependency('foo', {
+  // Both are optional.
+  skipGlobal: true,
+  cwd: process.cwd(),
+})
+```
 
 ### How it works
 
